@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel Administratora</title>
+</head>
+<body>
+    <h1>Panel Administratora</h1>
+    <form action="{{ url_for('start_auction') }}" method="post">
+        <button type="submit">Start Aukcji</button>
+    </form>
+    <form action="{{ url_for('set_auction_settings') }}" method="post">
+        <label for="round_time">Czas trwania rundy:</label>
+        <input type="number" name="round_time" value="{{ round_time }}">
+        <label for="technical_round_time">Czas trwania rundy technicznej:</label>
+        <input type="number" name="technical_round_time" value="{{ technical_round_time }}">
+        <label for="start_price">Cena wywoławcza:</label>
+        <input type="number" name="start_price" value="{{ start_price }}">
+        <label for="bid_increment">Kwota przebicia:</label>
+        <input type="number" name="bid_increment" value="{{ bid_increment }}">
+        <button type="submit">Zapisz ustawienia</button>
+    </form>
+    <h2>Przebieg rund</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Runda</th>
+                {% for product in products %}
+                    <th>{{ product }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for round in range(1, current_round + 1) %}
+                <tr>
+                    <td>{{ round }}</td>
+                    {% for product in products %}
+                        <td>
+                            {% if bids[product]|length >= round %}
+                                {{ bids[product][round-1]['username'] }}: {{ bids[product][round-1]['amount'] }}
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

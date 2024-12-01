@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Panel Użytkownika</title>
+    <script>
+        function updateTime() {
+            fetch('/get_time_remaining')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('time_remaining').innerText = data.time_remaining + ' sekund';
+                });
+        }
+        setInterval(updateTime, 1000);
+    </script>
+</head>
+<body>
+    <h1>Witaj, {{ username }}</h1>
+    <div>
+        <span>Runda: {{ current_round }}</span>
+        <span>Czas do końca rundy: <span id="time_remaining">{{ round_time }} sekund</span></span>
+    </div>
+    <div>
+        <span>Możliwe oferty do złożenia: 2</span>
+    </div>
+    <div>
+        <h2>Podsumowanie złożonych ofert</h2>
+        <ul>
+            {% for product, user_bids in user_bids_summary.items() %}
+                <li>{{ product }}:
+                    <ul>
+                        {% for bid in user_bids %}
+                            <li>{{ bid.amount }}</li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <form action="{{ url_for('place_bid') }}" method="post">
+        {% for product in products %}
+            <div>
+                <span>{{ product }}</span>
+                <span>Aktualna najwyższa oferta: 
+                    {% if bids[product] %}
+                        {{ bids[product][-1]['amount'] }}
+                    {% else %}
+                        {{ start_price }}
+                    {% endif %}
+                </span>
+                <input type="hidden" name="product" value="{{ product }}">
+                <input type="number" name="amount" placeholder="Twoja oferta" min="{% if bids[product] %}{{ bids[product][-1]['amount'] + bid_increment }}{% else %}{{ start_price + bid_increment }}{% endif %}">
+                <button type="submit">Licytuj</button>
+            </div>
+        {% endfor %}
+    </form>
+</body>
+</html>

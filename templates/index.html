@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Logowanie</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+        function updateLoginTimestamps() {
+            fetch('/get_login_timestamps')
+                .then(response => response.json())
+                .then(data => {
+                    for (const [user, timestamp] of Object.entries(data)) {
+                        const userElement = document.getElementById(user);
+                        if (userElement) {
+                            userElement.innerHTML = 'Zalogowany<br>' + timestamp;
+                        }
+                    }
+                });
+        }
+        setInterval(updateLoginTimestamps, 1000);
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Wybierz użytkownika</h1>
+        <div class="user-row">
+            {% for user in users %}
+                <div class="user-box">
+                    <a href="{{ url_for('login', username=user) }}">{{ user }}</a>
+                    <p id="{{ user }}">
+                        {% if session.get('username') == user %}
+                            Zalogowany<br>{{ login_timestamps[user] }}
+                        {% endif %}
+                    </p>
+                </div>
+            {% endfor %}
+            <div class="user-box">
+                <a href="{{ url_for('login', username=admin) }}">{{ admin }}</a>
+                <p id="{{ admin }}">
+                    {% if session.get('username') == admin %}
+                        Zalogowany<br>{{ login_timestamps[admin] }}
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
