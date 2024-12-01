@@ -1,49 +1,69 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Panel Administratora</title>
-</head>
-<body>
-    <h1>Panel Administratora</h1>
-    <form action="{{ url_for('start_auction') }}" method="post">
-        <button type="submit">Start Aukcji</button>
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Panel Administratora</h1>
+
+<!-- Pasek przycisków -->
+<div class="btn-group mb-4" role="group">
+    <form action="{{ url_for('reset') }}" method="post" style="display: inline;">
+        <button type="submit" class="btn btn-warning">1 - Restart aukcji</button>
     </form>
-    <form action="{{ url_for('set_auction_settings') }}" method="post">
-        <label for="round_time">Czas trwania rundy:</label>
-        <input type="number" name="round_time" value="{{ round_time }}">
-        <label for="technical_round_time">Czas trwania rundy technicznej:</label>
-        <input type="number" name="technical_round_time" value="{{ technical_round_time }}">
-        <label for="start_price">Cena wywoławcza:</label>
-        <input type="number" name="start_price" value="{{ start_price }}">
-        <label for="bid_increment">Kwota przebicia:</label>
-        <input type="number" name="bid_increment" value="{{ bid_increment }}">
-        <button type="submit">Zapisz ustawienia</button>
+    <form action="{{ url_for('start_auction') }}" method="post" style="display: inline;">
+        <button type="submit" class="btn btn-success">3 - Rozpocznij aukcję</button>
     </form>
-    <h2>Przebieg rund</h2>
-    <table>
+    <form action="{{ url_for('end_round') }}" method="post" style="display: inline;">
+        <button type="submit" class="btn btn-danger">4 - Zakończ rundę</button>
+    </form>
+    <form action="{{ url_for('next_round') }}" method="post" style="display: inline;">
+        <button type="submit" class="btn btn-primary">5 - Następna runda</button>
+    </form>
+    <form action="{{ url_for('end_auction') }}" method="post" style="display: inline;">
+        <button type="submit" class="btn btn-dark">6 - Zakończ aukcję</button>
+    </form>
+</div>
+
+<!-- Sekcja z ustawieniami aukcji -->
+<h2>Ustawienia Aukcji</h2>
+<form action="{{ url_for('update_auction_settings') }}" method="post">
+    <table class="table table-bordered">
         <thead>
             <tr>
-                <th>Runda</th>
-                {% for product in products %}
-                    <th>{{ product }}</th>
-                {% endfor %}
+                <th>Numer Rundy</th>
+                <th>Nazwa Produktu</th>
+                <th>Cena Wywoławcza (zł)</th>
+                <th>Cena Przebicia (zł)</th>
+                <th>Aktualny Zwycięzca</th>
             </tr>
         </thead>
         <tbody>
-            {% for round in range(1, current_round + 1) %}
-                <tr>
-                    <td>{{ round }}</td>
-                    {% for product in products %}
-                        <td>
-                            {% if bids[product]|length >= round %}
-                                {{ bids[product][round-1]['username'] }}: {{ bids[product][round-1]['amount'] }}
-                            {% endif %}
-                        </td>
-                    {% endfor %}
-                </tr>
+            {% for idx, (product, price) in produkty_list %}
+            <tr>
+                <td>{{ idx }}</td>
+                <td>
+                    <input type="text" name="product_{{ idx }}" value="{{ product }}" class="form-control" readonly>
+                </td>
+                <td>
+                    <input type="number" name="starting_price_{{ idx }}" value="{{ price }}" class="form-control" min="1">
+                </td>
+                <td>
+                    <input type="number" name="bid_increment_{{ idx }}" value="{{ 5 }}" class="form-control" min="1">
+                </td>
+                <td>
+                    <input type="text" name="winner_{{ idx }}" value="{{ licytacje[product][-1] if licytacje[product] else 'Brak' }}" class="form-control" readonly>
+                </td>
+            </tr>
             {% endfor %}
         </tbody>
     </table>
-</body>
-</html>
+    <button type="submit" class="btn btn-primary">Zapisz Zmiany</button>
+</form>
+
+<!-- Sekcja z użytkownikami -->
+<h2>Zalogowani Użytkownicy</h2>
+<ul>
+    {% for user in zalogowani_uzytkownicy %}
+    <li>{{ user }}</li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

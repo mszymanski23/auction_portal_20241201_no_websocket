@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .navbar .user-info {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="navbar">
+    <span class="user-info">Witaj, {{ session.get('user', 'Gość') }}!</span>
+    {% if session.get('user') %}
+    <a href="{{ url_for('logout') }}" class="btn btn-danger btn-sm">Wyloguj</a>
+    {% endif %}
+</div>
+<div class="container">
+    <div class="alert alert-info">
+        {% if round_number == 0 %}
+            Aukcja się jeszcze nie rozpoczęła
+        {% else %}
+            Obecnie trwa runda {{ round_number }}
+        {% endif %}
+    </div>
+    {% block content %}
+    {% endblock %}
+</div>
+</body>
+</html>

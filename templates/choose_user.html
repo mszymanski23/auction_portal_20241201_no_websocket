@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Wybierz użytkownika</h1>
+<form method="post">
+    {% for user in uzytkownicy %}
+    <button type="submit" name="user" value="{{ user }}" {% if user in zalogowani_uzytkownicy %}disabled{% endif %}>
+        {{ user }}
+    </button>
+    {% endfor %}
+</form>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <p style="color: red;">{{ messages[-1] }}</p>
+    {% endif %}
+{% endwith %}
+{% endblock %}
