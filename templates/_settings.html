@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Ustawienia Aukcji</h1>
+
+<!-- Edytowalna tabela -->
+<form action="{{ url_for('update_auction_settings') }}" method="post">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Numer Rundy</th>
+                <th>Nazwa Produktu</th>
+                <th>Cena Wywoławcza (zł)</th>
+                <th>Cena Przebicia (zł)</th>
+                <th>Aktualny Zwycięzca</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for idx, (product, price) in enumerate(produkty.items()) %}
+            <tr>
+                <td>{{ idx + 1 }}</td>
+                <td>
+                    <input type="text" name="product_{{ idx }}" value="{{ product }}" class="form-control" readonly>
+                </td>
+                <td>
+                    <input type="number" name="starting_price_{{ idx }}" value="{{ price }}" class="form-control" min="1">
+                </td>
+                <td>
+                    <input type="number" name="bid_increment_{{ idx }}" value="{{ 5 }}" class="form-control" min="1">
+                </td>
+                <td>
+                    <input type="text" name="winner_{{ idx }}" value="{{ licytacje[product][-1] if licytacje[product] else 'Brak' }}" class="form-control" readonly>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-primary">Zapisz Zmiany</button>
+</form>
+{% endblock %}
