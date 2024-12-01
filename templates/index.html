@@ -1,48 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Logowanie</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script>
-        function updateLoginTimestamps() {
-            fetch('/get_login_timestamps')
-                .then(response => response.json())
-                .then(data => {
-                    for (const [user, timestamp] of Object.entries(data)) {
-                        const userElement = document.getElementById(user);
-                        if (userElement) {
-                            userElement.innerHTML = 'Zalogowany<br>' + timestamp;
-                        }
-                    }
-                });
-        }
-        setInterval(updateLoginTimestamps, 1000);
-    </script>
-</head>
-<body>
-    <div class="container">
-        <h1>Wybierz użytkownika</h1>
-        <div class="user-row">
-            {% for user in users %}
-                <div class="user-box">
-                    <a href="{{ url_for('login', username=user) }}">{{ user }}</a>
-                    <p id="{{ user }}">
-                        {% if session.get('username') == user %}
-                            Zalogowany<br>{{ login_timestamps[user] }}
-                        {% endif %}
-                    </p>
-                </div>
-            {% endfor %}
-            <div class="user-box">
-                <a href="{{ url_for('login', username=admin) }}">{{ admin }}</a>
-                <p id="{{ admin }}">
-                    {% if session.get('username') == admin %}
-                        Zalogowany<br>{{ login_timestamps[admin] }}
-                    {% endif %}
-                </p>
-            </div>
-        </div>
-    </div>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Aukcja</h1>
+<p>Witaj, {{ user }}!</p>
+
+<div id="auction-data">
+    <h2>Dane Aukcji:</h2>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Produkt</th>
+                <th>Cena Wywoławcza</th>
+                <th>Inkrement</th>
+            </tr>
+        </thead>
+        <tbody id="auction-table-body">
+            <!-- Dane będą aktualizowane przez JavaScript -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // Funkcja do pobierania danych aukcji
+    function fetchAuctionSettings() {
+        fetch('/get_auction_settings')
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.getElementById('auction-table-body');
+                tableBody.innerHTML = ''; // Wyczyść tabelę
+                for (const [product, info] of Object.entries(data)) {
+                    const row = `<tr>
+                        <td>${product}</td>
+                        <td>${info.starting_price} zł</td>
+                        <td>${info.bid_increment} zł</td>
+                    </tr>`;
+                    tableBody.innerHTML += row;
+                }
+            })
+            .catch(error => console.error('Error fetching auction data:', error));
+    }
+
+    // Odświeżaj dane co 5 sekund
+    setInterval(fetchAuctionSettings, 1000);
+    // Pierwsze pobranie danych
+    fetchAuctionSettings();
+</script>
+{% endblock %}
